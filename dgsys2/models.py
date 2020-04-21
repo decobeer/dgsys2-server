@@ -11,8 +11,14 @@ class Membership(models.Model):
 
 
 class User(AbstractUser):
+    email = models.EmailField(max_length=254, unique=True)
     membership = models.ForeignKey(Membership, on_delete=models.SET_DEFAULT, null=False, default=1)
     membership_expiry = models.DateTimeField(null=True)
+
+    USERNAME_FIELD = 'email'
+    EMAIL_FIELD = 'email'
+
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def membership_label(self):
         return self.membership.label
@@ -46,7 +52,7 @@ class Equipment(models.Model):
 
 class EquipmentPrice(models.Model):
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE)
-    equipment_article = models.ForeignKey(Equipment, on_delete=models.CASCADE)
+    equipment_article = models.ForeignKey(Equipment, on_delete=models.CASCADE, related_name='prices')
     price = models.FloatField()
 
     class Meta:
