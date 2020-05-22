@@ -32,5 +32,8 @@ urlpatterns = [
     path('api/payment/', views.payment),
     path('api/equipment/', views.equipment),
     path('api/equipment/categories/', views.equipment_category),
-    path('api/reservation/', views.reservation)
+    path('api/reservation/', views.reservation),
+    path('api/rental/', views.rental),
+    path('api/rental/open/', views.rental_open),
+    path('api/rental/<int:pk>', views.rental_detail),
 ]

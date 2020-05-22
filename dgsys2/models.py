@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Sum
@@ -19,6 +21,9 @@ class User(AbstractUser):
     EMAIL_FIELD = 'email'
 
     REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    def is_member(self):
+        return self.membership.id > 0
 
     def membership_label(self):
         return self.membership.label
@@ -75,7 +80,8 @@ class Reservation(models.Model):
 class Rental(models.Model):
     equipment_articles = models.ManyToManyField(Equipment)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    estimated_end = models.DateTimeField(default=datetime.now)
     amount = models.FloatField(default=0, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

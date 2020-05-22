@@ -17,11 +17,12 @@ from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from dgsys2.models import *
-from dgsys2.serializers import UserSerializer, PaymentSerializer, EquipmentSerializer, ReservationSerializer, \
-    ExpandedReservationSerializer, EquipmentCategorySerializer
+from dgsys2.serializers import *
 
 import datetime
 import dateutil.parser
+
+from dgsys2.view_utils import *
 
 
 @api_view(['GET', 'POST'])
@@ -58,49 +59,7 @@ def payment(request):
             return JsonResponse(serializer.errors, status=400)
 
 
-def serializeEquipment(item, request, from_date=None, to_date=None):
-    price = EquipmentPrice.objects.filter(
-        equipment_article__id=item.id,
-        membership=request.user.membership
-    ).values('price')[0]['price']
 
-    occupants = ""
-
-    if from_date is not None and to_date is not None:
-        print()
-        rentals = Rental.objects.filter(
-            equipment_articles=item,
-            start_date__range=(from_date, to_date),
-            end_date__range=(from_date, to_date),
-        ).values("user__first_name", "user__last_name").distinct()
-
-        reservations = Reservation.objects.filter(
-            equipment_articles__label=item,
-            start_date__range=(from_date, to_date),
-            end_date__range=(from_date, to_date),
-        ).values("user__first_name", "user__last_name").distinct()
-
-        for r in rentals:
-            if len(occupants) > 0:
-                occupants += ", "
-            occupants += r['user__first_name'] + " " + r['user__last_name'][0]
-
-        for r in reservations:
-            if len(occupants) > 0:
-                occupants += ", "
-            occupants += r['user__first_name'] + " " + r['user__last_name'][0]
-
-    item_dict = {
-        'category': item.category.label,
-        'category_id': item.category_id,
-        'id': item.id,
-        'description': item.description,
-        'label': item.label,
-        'price': price,
-        'occupants': occupants
-    }
-
-    return item_dict
 
 
 @api_view(['GET'])
@@ -112,13 +71,12 @@ def equipment(request):
         from_date = dateutil.parser.parse(request.GET['from'])
         to_date = dateutil.parser.parse(request.GET['to'])
 
-
         available_eq = Equipment.objects.exclude(
-            rental__start_date__range=(from_date, to_date),
-            rental__end_date__range=(from_date, to_date),
+            rental__start_date__lt=to_date,
+            rental__end_date__gt=from_date
         ).exclude(
-            reservation__start_date__range=(from_date, to_date),
-            reservation__end_date__range=(from_date, to_date),
+            reservation__start_date__lt=to_date,
+            reservation__end_date__gt=from_date
         )
 
         occupied_eq = Equipment.objects.exclude(
@@ -187,30 +145,93 @@ def reservation(request):
                     serializer.save()
                     return JsonResponse(serializer.data, status=201)
                 else:
-                    return JsonResponse({'error': 'Selected equipment is occupied'}, status=412)
+                    return occupied_response()
             else:
                 return JsonResponse(serializer.errors, status=400)
         else:
             return JsonResponse({'error': 'User is not logged in'})
 
 
-def equipment_is_available(equipmentIds, from_date, to_date):
-    available = True
 
-    for eq_id in equipmentIds:
+
+@api_view(['GET', 'POST'])
+@csrf_exempt
+def rental(request):
+    if request.method == 'GET' and request.user.is_authenticated:
         rentals = Rental.objects.filter(
-            equipment_articles__id=eq_id,
-            start_date__range=(from_date, to_date),
-            end_date__range=(from_date, to_date),
-        ).count()
+            user=request.user
+        )
+        serializer = RentalSerializer(rentals, many=True)
+        data = {'data': serializer.data}
+        return JsonResponse(data)
 
-        reservations = Reservation.objects.filter(
-            equipment_articles__id=eq_id,
-            start_date__range=(from_date, to_date),
-            end_date__range=(from_date, to_date),
-        ).count()
+    if request.method == 'POST' and request.user.is_authenticated:
+        data = JSONParser().parse(request)
+        data['user'] = request.user.id
+        serializer = RentalSerializer(data=data)
+        if serializer.is_valid():
+            if equipment_is_available(
+                    data['equipment_articles'],
+                    data['start_date'],
+                    data['estimated_end'],
+                    False):
+                serializer.save()
+                return JsonResponse(data, status=201)
+            return occupied_response()
 
-        if rentals > 0 or reservations > 0:
-            available = False
 
-    return available
+@api_view(['GET', 'PUT'])
+@csrf_exempt
+def rental_detail(request, pk):
+    try:
+        rental = Rental.objects.filter(user=request.user).get(pk=pk)
+    except Rental.DoesNotExist:
+        return Response(status=404)
+
+    if request.method == 'GET':
+        serializer = RentalSerializer(rental)
+        return JsonResponse({'data': serializer.data})
+
+    if request.method == 'PUT':
+        data = JSONParser().parse(request)
+        if data['end_date'] is not None:
+            triggered_upgrade = upgrade_if_eligible(request.user)
+            end_date = dateutil.parser.parse(data['end_date'])
+            rental.end_date = end_date
+            rental.amount = total_rental_price(
+                request.user,
+                rental.equipment_articles.all(),
+                rental.start_date,
+                rental.end_date
+            )
+            rental.save()
+            serialized_rental = RentalSerializerNoArticles(rental).data
+            serialized_rental['equipment_articles'] =\
+                [serializeEquipment(item, request) for item in rental.equipment_articles.all()]
+            data = {
+                'meta:': {
+                    'triggered_upgrade': triggered_upgrade
+                },
+                'data': serialized_rental
+            }
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'error': 'PUT can only update field end_date'}, status=400)
+
+
+@api_view(['GET'])
+@csrf_exempt
+def rental_open(request):
+    if request.method == 'GET' and request.user.is_authenticated:
+        rentals = Rental.objects.filter(
+            user=request.user,
+            end_date__isnull=True
+        )
+        serialized_rentals = []
+        for rental in rentals:
+            serialized = RentalSerializerNoArticles(rental).data
+            serialized['equipment_articles'] = [serializeEquipment(item, request) for item in rental.equipment_articles.all()]
+            serialized_rentals.append(serialized)
+
+        data = {'data': serialized_rentals}
+        return JsonResponse(data)

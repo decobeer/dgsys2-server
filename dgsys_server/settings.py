@@ -27,9 +27,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'b56go5tkuvfx07d$fs9aiyn#zhm3^c5d6a&u!%hs=5j8qe*xb9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2', 'dgsys-beta.dykkergruppa.no']
 
 AUTH_USER_MODEL = 'dgsys2.User'
 
@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'dgsys2',
-    'django_rest_passwordreset'
+    'django_rest_passwordreset',
+    'corsheaders',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -56,6 +58,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'dgsys_server.urls'
@@ -84,10 +88,15 @@ WSGI_APPLICATION = 'dgsys_server.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default':
+        {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'dykkengk_dgsys_beta',
+            'USER': 'dykkengk_dgsys-beta',
+            'PASSWORD': '6S4wx3DAE8LpQmF',
+            'HOST': 'localhost',
+            'PORT': '5432'
+        }
 }
 
 
@@ -135,8 +144,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
@@ -170,3 +180,21 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+CRONJOBS = [
+    ('*/5 * * * *', 'dgsys2.cron_jobs.reset_plus_members')
+]
+
+SECURE_HSTS_SECONDS = 60
+
+SECURE_SSL_REDIRECT = True
+
+SESSION_COOKIE_SECURE = True
+
+SECURE_REFERRER_POLICY = "origin"
+
+CSRF_COOKIE_SECURE = True
+
+SECURE_HSTS_PRELOAD = True

@@ -71,3 +71,16 @@ class EquipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Equipment
         fields = ['id', 'category', 'label', 'description']
+
+
+class RentalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rental
+        fields = '__all__'
+
+
+class RentalSerializerNoArticles(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rental
+        fields = ['id', 'start_date', 'estimated_end', 'end_date', 'amount']

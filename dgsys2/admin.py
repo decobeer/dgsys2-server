@@ -26,13 +26,13 @@ class PurchaseInLine(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = [PaymentsInline, RentalInline, PurchaseInLine]
     fieldsets = [
-        (None, {'fields': ['username', 'password']}),
+        (None, {'fields': ['username', 'password', 'membership']}),
         ('Personal Info', {'fields': ['first_name', 'last_name', 'email']}),
         ('Important dates', {'fields': ['last_login', 'date_joined']}),
         ('Permissions', {'fields': ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'],
                          'classes': ['collapse']})
     ]
-    list_display = ['username', 'get_full_name', 'email', 'account_balance']
+    list_display = ['username', 'get_full_name', 'email', 'account_balance', 'membership']
 
 
 class EquipmentPriceInLine(admin.TabularInline):
