@@ -45,11 +45,19 @@ class EquipmentCategory(models.Model):
     def __str__(self):
         return self.label
 
+    class Meta:
+        verbose_name = 'Equipment Category'
+        verbose_name_plural = 'Equipment Categories'
+
 
 class Equipment(models.Model):
     category = models.ForeignKey(EquipmentCategory, on_delete=models.SET_NULL, null=True)
     label = models.CharField(max_length=16, unique=True)
     description = models.TextField(max_length=512)
+
+    class Meta:
+        verbose_name = 'Equipment'
+        verbose_name_plural = 'Equipment'
 
     def __str__(self):
         return self.label

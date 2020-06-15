@@ -181,7 +181,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 SECURE_HSTS_SECONDS = 60
 
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
 
 SESSION_COOKIE_SECURE = True
 
@@ -189,7 +189,7 @@ SECURE_REFERRER_POLICY = "origin"
 
 CSRF_COOKIE_SECURE = True
 
-SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_PRELOAD = True
 
 prod_db  =  dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(prod_db)

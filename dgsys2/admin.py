@@ -40,11 +40,23 @@ class EquipmentPriceInLine(admin.TabularInline):
     extra = 0
 
 
+class EquipmentCategoryAdmin(admin.ModelAdmin):
+    model = EquipmentCategory
+
+    class Meta:
+        verbose_name = 'Equipment Category'
+        verbose_name_plural = 'Equipment Categories'
+
+
 class EquipmentAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['category', 'label', 'description']})
     ]
     inlines = [EquipmentPriceInLine]
+
+    class Meta:
+        verbose_name = 'Equipment'
+        verbose_name_plural = 'Equipment'
 
 
 class ItemPriceInline(admin.TabularInline):
@@ -64,6 +76,7 @@ class ItemAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Equipment, EquipmentAdmin)
+admin.site.register(EquipmentCategory, EquipmentCategoryAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Membership)
 admin.site.register(Reservation)
