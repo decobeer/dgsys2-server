@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'dgsys2',
     'django_rest_passwordreset',
     'corsheaders',
-    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -88,15 +87,8 @@ WSGI_APPLICATION = 'dgsys_server.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default':
-        {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'dykkengk_dgsys_beta',
-            'USER': 'dykkengk_dgsys-beta',
-            'PASSWORD': '6S4wx3DAE8LpQmF',
-            'HOST': 'localhost',
-            'PORT': '5432'
-        }
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 }
 
 
@@ -182,10 +174,6 @@ SIMPLE_JWT = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-
-CRONJOBS = [
-    ('*/5 * * * *', 'dgsys2.cron_jobs.reset_plus_members')
-]
 
 SECURE_HSTS_SECONDS = 60
 
