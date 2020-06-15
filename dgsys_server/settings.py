@@ -188,3 +188,7 @@ SECURE_REFERRER_POLICY = "origin"
 CSRF_COOKIE_SECURE = True
 
 SECURE_HSTS_PRELOAD = True
+
+STATIC_ROOT = 'staticfiles'
+
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
