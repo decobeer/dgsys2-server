@@ -1,0 +1,1 @@
+from dgsys_server.wsgi import application
