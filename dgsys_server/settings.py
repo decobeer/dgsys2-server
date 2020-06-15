@@ -15,6 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from datetime import timedelta
 
+import dj_database_url
 from django.conf import settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +30,7 @@ SECRET_KEY = 'b56go5tkuvfx07d$fs9aiyn#zhm3^c5d6a&u!%hs=5j8qe*xb9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2', 'dgsys-beta.dykkergruppa.no']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2', 'dgsys-beta.dykkergruppa.no', 'https://dgsys-beta.herokuapp.com/']
 
 AUTH_USER_MODEL = 'dgsys2.User'
 
@@ -188,3 +189,6 @@ SECURE_REFERRER_POLICY = "origin"
 CSRF_COOKIE_SECURE = True
 
 SECURE_HSTS_PRELOAD = True
+
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)
