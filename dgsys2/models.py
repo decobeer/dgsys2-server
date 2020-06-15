@@ -81,7 +81,7 @@ class Rental(models.Model):
     equipment_articles = models.ManyToManyField(Equipment)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
-    estimated_end = models.DateTimeField(default=datetime.now)
+    estimated_end = models.DateTimeField(auto_now_add=True)
     amount = models.FloatField(default=0, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
