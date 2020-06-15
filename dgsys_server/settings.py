@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "django.contrib.staticfiles",
     'rest_framework',
     'dgsys2',
     'django_rest_passwordreset',
