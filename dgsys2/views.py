@@ -65,49 +65,20 @@ def payment(request):
 @api_view(['GET'])
 @csrf_exempt
 def equipment(request):
+    equipment_items = Equipment.objects.all()
+    equipment_list = []
 
     if None not in (request.GET.get('from', None), request.GET.get('to', None)):
-
         from_date = dateutil.parser.parse(request.GET['from'])
         to_date = dateutil.parser.parse(request.GET['to'])
-
-        available_eq = Equipment.objects.exclude(
-            rental__start_date__lt=to_date,
-            rental__end_date__gt=from_date
-        ).exclude(
-            reservation__start_date__lt=to_date,
-            reservation__end_date__gt=from_date
-        )
-
-        occupied_eq = Equipment.objects.exclude(
-            id__in=available_eq
-        )
-
-        serialized_available = []
-        serialized_unavailable = []
-
-        for item in available_eq:
-            serialized_available.append(serializeEquipment(item, request))
-
-        for item in occupied_eq:
-            serialized_unavailable.append(serializeEquipment(item, request, from_date, to_date))
-
-        data = {
-            'data': {
-                'available': serialized_available,
-                'occupied': serialized_unavailable
-            }
-        }
-
-        return JsonResponse(data, status=200)
+        for item in equipment_items:
+            equipment_list.append(serializeEquipment(item, request, from_date, to_date))
     else:
-        equipment_items = Equipment.objects.all()
-        equipment_list = []
         for item in equipment_items:
             equipment_list.append(serializeEquipment(item, request))
 
-        data = {'data': equipment_list}
-        return JsonResponse(data, status=200)
+    data = {'data': equipment_list}
+    return JsonResponse(data, status=200)
 
 
 @api_view(['GET'])

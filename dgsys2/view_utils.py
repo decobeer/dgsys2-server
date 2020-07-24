@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import JsonResponse
 
 from dgsys2.models import *
@@ -48,9 +49,9 @@ def serializeEquipment(item, request, from_date=None, to_date=None):
     if from_date is not None and to_date is not None:
         print()
         rentees = Rental.objects.filter(
-            equipment_articles=item,
-            start_date__lt=to_date,
-            end_date__gt=from_date
+            Q(end_date__gt=from_date) | Q(end_date__isnull=True),
+            equipment_articles__label=item.label,
+            start_date__lt=to_date
         ).values("user__first_name", "user__last_name").distinct()
         is_rented = rentees.count() > 0
 
@@ -61,7 +62,7 @@ def serializeEquipment(item, request, from_date=None, to_date=None):
         ).values("user__first_name", "user__last_name").distinct()
         is_reserved = reservators.count() > 0
 
-        occupants_qs = rentees.union(reservators).distinct()
+        occupants_qs = reservators.union(rentees).distinct()
 
         for o in occupants_qs:
             if len(occupants) > 0:
@@ -130,9 +131,9 @@ def upgrade_if_eligible(user):
 def select_semester(check_date: date):
     current_year = date.today().year
     if date(current_year, 9, 1) >= check_date >= date(current_year, 12, 31):
-        return {'start': datetime(current_year, 9, 1), 'end': datetime(current_year, 12,31)}
+        return {'start': datetime.datetime(current_year, 9, 1), 'end': datetime.datetime(current_year, 12,31)}
     else:
-        return {'start': datetime(current_year, 1, 1), 'end': datetime(current_year, 8, 31)}
+        return {'start': datetime.datetime(current_year, 1, 1), 'end': datetime.datetime(current_year, 8, 31)}
 
 
 def reset_plus_memberships():
