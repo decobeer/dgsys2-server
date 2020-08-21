@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Sum
@@ -99,6 +97,8 @@ class Rental(models.Model):
 
 class Item(models.Model):
     label = models.CharField(max_length=32)
+    rental_related = models.BooleanField(verbose_name='Associated to rentals')
+    price_per_unit = models.BooleanField(verbose_name='Show number input in app')
 
     def __str__(self):
         return self.label
@@ -120,6 +120,7 @@ class ItemPrice(models.Model):
 class ItemPurchase(models.Model):
     item = models.ForeignKey(ItemPrice, null=False, default=1, on_delete=models.SET_DEFAULT, verbose_name='Item')
     amount = models.FloatField()
+    quantity = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField()
     total = models.FloatField()

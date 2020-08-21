@@ -84,3 +84,9 @@ class RentalSerializerNoArticles(serializers.ModelSerializer):
     class Meta:
         model = Rental
         fields = ['id', 'start_date', 'estimated_end', 'end_date', 'amount']
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemPurchase
+        fields = '__all__'

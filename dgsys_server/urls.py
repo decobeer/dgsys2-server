@@ -36,4 +36,7 @@ urlpatterns = [
     path('api/rental/', views.rental),
     path('api/rental/open/', views.rental_open),
     path('api/rental/<int:pk>', views.rental_detail),
+    path('api/items/', views.items),
+    path('api/purchase/', views.purchase),
 ]
+

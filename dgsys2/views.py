@@ -17,12 +17,13 @@ from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from dgsys2.models import *
-from dgsys2.serializers import *
+from dgsys2.serializers import EquipmentCategorySerializer, ReservationSerializer, ExpandedReservationSerializer, \
+    RentalSerializer, UserSerializer, PaymentSerializer, RentalSerializerNoArticles
 
-import datetime
 import dateutil.parser
 
-from dgsys2.view_utils import *
+from dgsys2.view_utils import serializeEquipment, occupied_response, equipment_is_available, upgrade_if_eligible, \
+    total_rental_price, serialized_items
 
 
 @api_view(['GET', 'POST'])
@@ -206,3 +207,45 @@ def rental_open(request):
 
         data = {'data': serialized_rentals}
         return JsonResponse(data)
+
+
+@api_view(['GET'])
+@csrf_exempt
+def items(request):
+    if request.user.is_authenticated:
+        items = serialized_items(request.user)
+        return JsonResponse({'data': items})
+    else:
+        return JsonResponse({'error': 'User is not logged in'})
+
+
+@api_view(['POST'])
+@csrf_exempt
+def purchase(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        data = JSONParser().parse(request)['data']
+        user = request.user
+
+        total_price = 0
+
+        for purchase in data:
+            item = ItemPrice.objects.get(
+                item=purchase['item'],
+                membership=user.membership
+            )
+            amount = item.price
+            total = purchase['quantity'] * amount
+            total_price += total
+            db_purchase = ItemPurchase(
+                item=item,
+                total=total,
+                amount=amount,
+                date=datetime.now(),
+                quantity=purchase['quantity'],
+                user=user
+            )
+
+            db_purchase.save()
+
+        return JsonResponse({'total': total_price}, status=201)
+

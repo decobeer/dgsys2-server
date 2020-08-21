@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 
 from dgsys2.models import *
-from datetime import date
+from datetime import date, datetime
 
 
 def occupied_response():
@@ -131,9 +131,9 @@ def upgrade_if_eligible(user):
 def select_semester(check_date: date):
     current_year = date.today().year
     if date(current_year, 9, 1) >= check_date >= date(current_year, 12, 31):
-        return {'start': datetime.datetime(current_year, 9, 1), 'end': datetime.datetime(current_year, 12,31)}
+        return {'start': datetime(current_year, 9, 1), 'end': datetime(current_year, 12, 31)}
     else:
-        return {'start': datetime.datetime(current_year, 1, 1), 'end': datetime.datetime(current_year, 8, 31)}
+        return {'start': datetime(current_year, 1, 1), 'end': datetime(current_year, 8, 31)}
 
 
 def reset_plus_memberships():
@@ -142,3 +142,32 @@ def reset_plus_memberships():
         member.membership = Membership.objects.get(pk=2).first()
         member.save()
 
+
+def serialized_items(user):
+    membership = user.membership
+    itemset = Item.objects.all()
+    result = []
+    for item in itemset:
+        try:
+            price = ItemPrice.objects.get(
+                item=item,
+                membership=membership
+            )
+            print(price)
+            result.append({
+                'id': item.id,
+                'label': item.label,
+                'price': price.price,
+                'rental_related': item.rental_related,
+                'price_per_unit': item.price_per_unit
+            })
+        except ItemPrice.DoesNotExist:
+            result.append({
+                'id': item.id,
+                'label': item.label,
+                'price': 0,
+                'rental_related': item.rental_related,
+                'price_per_unit': item.price_per_unit
+            })
+
+    return result
