@@ -34,6 +34,15 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2', 'dgsys-beta.dykkergruppa.
 
 AUTH_USER_MODEL = 'dgsys2.User'
 
+CORS_ORIGIN_WHITELIST = [
+    '127.0.0.1',
+    'localhost',
+    '10.0.2.2',
+    'https://dgsys-beta.dykkergruppa.no',
+    'https://dgsys-beta.herokuapp.com/',
+    'https://dgsys-app-beta.herokuapp.com'
+]
+
 
 # Application definition
 
