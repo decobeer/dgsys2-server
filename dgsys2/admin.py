@@ -69,7 +69,7 @@ class ItemPriceInline(admin.TabularInline):
 
 class ItemAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['label']})
+        (None, {'fields': ['label', 'rental_related', 'price_per_unit']})
     ]
     inlines = [ItemPriceInline]
 
