@@ -90,6 +90,7 @@ class Rental(models.Model):
     estimated_end = models.DateTimeField(auto_now_add=True)
     amount = models.FloatField(default=0, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    note = models.TextField(default="", blank=True)
 
     def __str__(self):
         return self.user.username + " / " + str(self.start_date) + " / " + str(self.amount)

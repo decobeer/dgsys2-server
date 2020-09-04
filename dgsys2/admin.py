@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 from .models import *
 # Register your models here.
@@ -23,15 +24,16 @@ class PurchaseInLine(admin.StackedInline):
     classes = ['collapse']
 
 
-class UserAdmin(BaseUserAdmin):
+class DGUserAdmin(BaseUserAdmin):
     inlines = [PaymentsInline, RentalInline, PurchaseInLine]
-    fieldsets = [
-        (None, {'fields': ['username', 'password', 'membership']}),
+
+    """ fieldsets = [
+        (None, {'fields': ['username', 'membership']}),
         ('Personal Info', {'fields': ['first_name', 'last_name', 'email']}),
         ('Important dates', {'fields': ['last_login', 'date_joined']}),
         ('Permissions', {'fields': ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'],
-                         'classes': ['collapse']})
-    ]
+                         'classes': ['collapse']}) 
+    ]"""
     list_display = ['username', 'get_full_name', 'email', 'account_balance', 'membership']
 
 
@@ -74,7 +76,7 @@ class ItemAdmin(admin.ModelAdmin):
     inlines = [ItemPriceInline]
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, DGUserAdmin)
 admin.site.register(Equipment, EquipmentAdmin)
 admin.site.register(EquipmentCategory, EquipmentCategoryAdmin)
 admin.site.register(Item, ItemAdmin)

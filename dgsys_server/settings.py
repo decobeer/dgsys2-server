@@ -28,18 +28,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'b56go5tkuvfx07d$fs9aiyn#zhm3^c5d6a&u!%hs=5j8qe*xb9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2', 'dgsys-beta.dykkergruppa.no', 'dgsys-beta.herokuapp.com/', '.herokuapp.com', 'dgsys-app-beta.herokuapp.com']
 
 AUTH_USER_MODEL = 'dgsys2.User'
 
 CORS_ORIGIN_WHITELIST = [
-    '127.0.0.1',
-    'localhost',
-    '10.0.2.2',
+    'http://127.0.0.1',
+    'https://127.0.0.1',
+    'http://localhost',
+    'http://10.0.2.2',
     'https://dgsys-beta.dykkergruppa.no',
-    'https://dgsys-beta.herokuapp.com/',
+    'https://dgsys-beta.herokuapp.com',
     'https://dgsys-app-beta.herokuapp.com'
 ]
 
@@ -185,18 +186,18 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_HSTS_SECONDS = 60
 
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 
 SECURE_REFERRER_POLICY = "origin"
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 
 SECURE_HSTS_PRELOAD = True
 
