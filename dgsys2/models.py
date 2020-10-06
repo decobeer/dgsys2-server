@@ -11,6 +11,7 @@ class Membership(models.Model):
 
 
 class User(AbstractUser):
+    username = models.CharField(max_length=20, unique=True)
     email = models.EmailField(max_length=254, unique=True)
     membership = models.ForeignKey(Membership, on_delete=models.SET_DEFAULT, null=False, default=1)
     membership_expiry = models.DateTimeField(null=True)
@@ -18,7 +19,7 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
 
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def is_member(self):
         return self.membership.id > 0
