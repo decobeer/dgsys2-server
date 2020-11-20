@@ -41,7 +41,8 @@ CORS_ORIGIN_WHITELIST = [
     'http://10.0.2.2',
     'https://dgsys-beta.dykkergruppa.no',
     'https://dgsys-beta.herokuapp.com',
-    'https://dgsys-app-beta.herokuapp.com'
+    'https://dgsys-app-beta.herokuapp.com',
+    'https://dgsys.dykkergruppa.no'
 ]
 
 
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     'dgsys2',
     'django_rest_passwordreset',
     'corsheaders',
+    'whitenoise',
 ]
 
 MIDDLEWARE = [
@@ -78,7 +80,7 @@ ROOT_URLCONF = 'dgsys_server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, 'staticfiles/app')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
