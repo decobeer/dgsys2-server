@@ -26,10 +26,9 @@ class PurchaseInLine(admin.StackedInline):
 
 class DGUserAdmin(BaseUserAdmin):
     inlines = [PaymentsInline, RentalInline, PurchaseInLine]
-
     fieldsets = [
         (None, {'fields': ['username', 'membership']}),
-        ('Personal Info', {'fields': ['first_name', 'last_name', 'email']}),
+        ('Personal Info', {'fields': ['first_name', 'last_name', 'email', 'phone', 'address', 'zip_code', 'city']}),
         ('Important dates', {'fields': ['last_login', 'date_joined']}),
         ('Permissions', {'fields': ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'],
                          'classes': ['collapse']}) 
