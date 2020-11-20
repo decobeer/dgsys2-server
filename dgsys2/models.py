@@ -15,6 +15,10 @@ class User(AbstractUser):
     email = models.EmailField(max_length=254, unique=True)
     membership = models.ForeignKey(Membership, on_delete=models.SET_DEFAULT, null=False, default=1)
     membership_expiry = models.DateTimeField(null=True)
+    address = models.TextField(null=True, verbose_name="Address Line")
+    zip_code = models.IntegerField(null=True, verbose_name='Zip Code')
+    phone = models.IntegerField(null=True)
+    city = models.TextField(null=True)
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
